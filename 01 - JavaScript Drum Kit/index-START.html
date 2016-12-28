@@ -6,8 +6,6 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
-
   <div class="keys">
     <div data-key="65" class="key">
       <kbd>A</kbd>
@@ -59,6 +57,23 @@
 
 <script>
 
+  function playSound() {
+    const audioOffKey = document.querySelector(`audio[data-key="${e.keyCode}"]`);
+    if (!audioOffKey) return;
+    const key = document.querySelector(`.key[data-key="${e.keyCode}"]`);
+    audioOffKey.currentTime = 0;
+    key.classList.add('playing');
+    audioOffKey.play();
+  }
+
+  function removeTransition(e) {
+    if (e.propertyName !== 'transform') return;
+    this.classList.remove('playing');
+  }
+
+  window.addEventListener('keydown', playSound);
+  const keys = document.querySelectorAll('.key');
+  keys.forEach(key => key.addEventListener('transitionend', removeTransition));
 </script>
 
 
