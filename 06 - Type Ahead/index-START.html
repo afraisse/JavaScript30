@@ -1,22 +1,64 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Type Ahead 👀</title>
-  <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <title>Type Ahead 👀</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <form class="search-form">
+<form class="search-form" onsubmit="">
     <input type="text" class="search" placeholder="City or State">
     <ul class="suggestions">
-      <li>Filter for a city</li>
-      <li>or a state</li>
+        <li>Filter for a city</li>
+        <li>or a state</li>
     </ul>
-  </form>
+</form>
 <script>
-const endpoint = 'https://gist.githubusercontent.com/Miserlou/c5cd8364bf9b2420bb29/raw/2bf258763cdddd704f8ffd3ea9a3e81d25e2c6f6/cities.json';
+    const endpoint = 'https://gist.githubusercontent.com/Miserlou/c5cd8364bf9b2420bb29/raw/2bf258763cdddd704f8ffd3ea9a3e81d25e2c6f6/cities.json';
+
+    const cities = [];
+    fetch(endpoint)
+        .then(blob => blob.json())
+        .then(data => cities.push(...data));
+
+    function findMatches(wordToMatch, cities) {
+        return cities.filter(place => {
+            const regex = new RegExp(wordToMatch, 'gi');
+            return place.city.match(regex) || place.state.match(wordToMatch);
+        });
+    }
+
+    function displayMatches() {
+        if (this.value.length === 0) {
+            // flush
+            suggestions.innerHTML = '';
+            return;
+        }
+
+        const matches = findMatches(this.value, cities);
+        const html = matches.map(place => {
+            const matchReg = new RegExp(this.value, 'gi');
+            const hl = `<span class="hl">${this.value}</span>`;
+
+            const city = place.city.replace(matchReg, hl);
+            const state = place.state.replace(matchReg, hl);
+            console.log(place.population);
+            return `
+               <li>
+                <span class="name">${city}, ${state}</span>
+                <span class="population">${Number(place.population).toLocaleString('en')}</span>
+               </li>
+            `
+        }).join('');
+        suggestions.innerHTML = html;
+    }
+
+    const searchBox = document.querySelector('input.search');
+    const suggestions = document.querySelector('ul.suggestions');
+    searchBox.addEventListener('change', displayMatches);
+    searchBox.addEventListener('keyup', displayMatches);
 
 </script>
-  </body>
+</body>
 </html>
