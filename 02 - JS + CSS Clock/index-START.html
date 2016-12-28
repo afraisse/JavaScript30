@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!--suppress JSDuplicatedDeclaration -->
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -56,17 +57,92 @@
     }
 
     .hand {
+      transform-origin: 100%;
+      transform: rotate(90deg);
       width:50%;
       height:6px;
       background:black;
       position: absolute;
       top:50%;
+      transition: all 0.05s;
+      transition-timing-function: cubic-bezier(0, 3.49, 0.58, 1);
     }
-
   </style>
 
   <script>
+    const secondsHand = document.querySelector('.second-hand');
+    const minutesHand = document.querySelector('.min-hand');
+    const hoursHand = document.querySelector('.hour-hand');
 
+    // Initialize clock
+    const date = new Date();
+    secondsHand.style.transform = `rotate(${90 + ( date.getSeconds() / 60 ) * 360}deg)`;
+    minutesHand.style.transform = `rotate(${90 + ( date.getMinutes() / 60 ) * 360}deg)`;
+    hoursHand.style.transform = `rotate(${90 + ( date.getHours() / 12 ) * 360}deg)`;
+
+    // Calculate all degrees before for optimization
+    const rotate60Table = [];
+    for(var i = 0; i < 60; i++)
+      rotate60Table[i] = 90 + ( i / 60 ) * 360;
+    const rotate24Table = [];
+    for(var i = 0; i < 24; i++)
+      rotate24Table[i] = 90 + ( i / 12 ) * 360;
+
+    function setDateOptim() {
+      const date = new Date();
+
+      const seconds = date.getSeconds();
+      secondsHand.style.transform = `rotate(${rotate60Table[seconds]}deg)`;
+
+      // Only update minute hand if needed and remove transition when rotating back to 90°
+      if (seconds === 0) {
+        secondsHand.style.transition = 'none';
+      } else if (seconds === 1) {
+        secondsHand.style.transition = 'all 0.05s';
+        secondsHand.style.transitionTimingFunction = 'cubic-bezier(0, 3.49, 0.58, 1)';
+      } else return;
+
+      const minutes = date.getMinutes();
+      minutesHand.style.transform = `rotate(${rotate60Table[minutes]}deg)`;
+      if (minutes === 0) {
+        minutesHand.style.transition = 'none';
+      } else if (minutes === 1) {
+        minutesHand.style.transition = 'all 0.05s';
+        minutesHand.style.transitionTimingFunction = 'cubic-bezier(0, 3.49, 0.58, 1)';
+      } else return;
+
+      // Only update hour hand if needed
+      if (minutes !== 0) return;
+
+      const hours = date.getHours();
+      hoursHand.style.transform = `rotate(${rotate24Table[hours]}deg)`;
+    }
+    setInterval(setDateOptim, 1000);
+
+    function setDate() {
+      const date = new Date();
+
+      const seconds = date.getSeconds();
+      const secondsDegrees = 90 + ( seconds / 60 ) * 360;
+      secondsHand.style.transform = `rotate(${secondsDegrees}deg)`;
+      secondsHand.style.transform = `rotate(${secondsDegrees}deg)`;
+
+
+      // Only calculate minutesDegrees if needed
+      if (seconds !== 0) return;
+
+      const minutes = date.getMinutes();
+      const minutesDegrees = 90 + ( minutes / 60 ) * 360;
+      minutesHand.style.transform = `rotate(${minutesDegrees}deg)`;
+
+      // Only calculate hoursDegrees if needed
+      if (minutes !== 0) return;
+
+      const hours = date.getHours();
+      const hoursDegrees = 90 + ( hours / 12 ) * 360;
+      hoursHand.style.transform = `rotate(${hoursDegrees}deg)`;
+    }
+    //setInterval(setDate, 1000);
 
   </script>
 </body>
