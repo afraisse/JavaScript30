@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+  <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -104,6 +104,58 @@
   </div>
 
 <script>
+//  let shiftPressed = false;
+//
+//  function isShiftKeyDown(e) {
+//    if (e.shiftKey)
+//      shiftPressed = true;
+//  }
+//  function isShiftKeyUp(e) {
+//    if (e.key === 'Shift')
+//      shiftPressed = false;
+//  }
+//
+//  document.addEventListener('keydown', isShiftKeyDown);
+//  document.addEventListener('keyup', isShiftKeyUp);
+
+  const checkboxes = [...document.querySelectorAll('.item > input[type="checkbox"]')];
+  let lastChecked;
+  function handleCheck(e) {
+    let inBetween = false;
+    if (e.shiftKey && this.checked) {
+      checkboxes.forEach(checkbox => {
+        if (checkbox === this || checkbox === lastChecked) {
+          inBetween = !inBetween;
+        }
+        if (inBetween) {
+          checkbox.checked = true;
+        }
+      });
+    }
+    this.checked = true;
+    lastChecked = this;
+  }
+
+  checkboxes.forEach(checkbox => checkbox.addEventListener('click', handleCheck));
+
+//  checkboxes.forEach((input, i, array) => input.addEventListener('click', function() {
+//    if (!shiftPressed) return;
+//
+//    const index = checkboxes.findIndex(e => e.checked);
+//    if (index === i) return;
+//
+//    if (index > i) {
+//      for (j = i+1; j < index; j++) {
+//        array[j].checked = true;
+//      }
+//    } else {
+//      for (j = index+1; j < i; j++) {
+//        array[j].checked = true;
+//      }
+//    }
+//
+//  }));
+
 </script>
 </body>
 </html>
